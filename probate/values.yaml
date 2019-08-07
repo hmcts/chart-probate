@@ -1,0 +1,225 @@
+tags:
+  ccd-enabled: true                     # ccd-chart chart
+  idam-pr: true                         # citizen-frontend chart - will add IDAM redirect urls
+  ccd-idam-pr: true                     # claim-store chart - will add IDAM redirect urls
+  rpe-feature-toggle-api-pod: true      # citizen-frontend dep
+  postgresql-pod: false                 # any chart specific postgres
+  blobstorage: false                    # blob storage for dm-store
+
+### probate SERVICES ###
+# probate-submit-service:
+#   java:
+
+
+probate-frontend:
+  nodejs:
+    image: hmcts.azurecr.io/hmcts/probate-frontend:latest
+    readinessDelay: 180
+    livenessDelay: 180
+    readinessPeriod: 60
+    livenessPeriod: 60
+    keyVaults:
+    environment:
+      IDAM_SERVICE_KEY: AAAAAAAAAAAAAAAA
+      FEATURE_TOGGLES_API_URL: http://${SERVICE_NAME}-ftr-tgl-api
+      SERVICES_PERSISTENCE_BASEURL : http://probate-persistence-service-aat.service.core-compute-aat.internal
+      SERVICES_NOTIFY_INVITEDATA_INVITELINK : http://probate-frontend-aat.service.core-compute-aat.internal/executors/invitation/
+      SERVICES_PDF_SERVICE_URL : http://cmc-pdf-service-aat.service.core-compute-aat.internal
+      SERVICES_AUTH_PROVIDER_BASEURL : http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+      DOCUMENT_MANAGEMENT_URL : http://dm-store-aat.service.core-compute-aat.internal
+      FEES_REGISTRY_URL: http://fees-register-api-aat.service.core-compute-aat.internal/fees-register
+      IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
+      IDAM_URL: https://idam-api.aat.platform.hmcts.net
+      IDAM_LOGIN_URL: https://idam-web-public.aat.platform.hmcts.net/login
+      IDAM_S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+      S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+      IDAM_S2S_AUTH_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+      PAYMENT_API_URL: http://payment-api-aat.service.core-compute-aat.internal
+      VALIDATION_SERVICE_URL: http://probate-business-service-aat.service.core-compute-aat.internal/validate
+      BUSINESS_DOCUMENT_URL: http://probate-business-service-aat.service.core-compute-aat.internal/businessDocument
+      SUBMIT_SERVICE_URL: http://probate-submit-service-aat.service.core-compute-aat.internal
+      ORCHESTRATOR_SERVICE_URL : http://probate-orchestrator-service-aat.service.core-compute-aat.internal
+      PERSISTENCE_SERVICE_URL: http://probate-persistence-service-aat.service.core-compute-aat.internal/formdata
+      IDAM_SERVICE_KEY: ${IDAM_S2S_SECRET}
+      IDAM_API_OAUTH2_CLIENT_CLIENT_SECRETS_PROBATE: ${IDAM_SECRET_PROBATE}
+      POSTCODE_SERVICE_URL: ${PRO_POSTCODE_SERVICE_URL}
+      POSTCODE_SERVICE_TOKEN: ${PRO_POSTCODE_SERVICE_TOKEN}
+      SURVEY: ${PRO_SURVEY}
+      SURVEY_END_OF_APPLICATION: ${PRO_SURVEY_END_OF_APPLICATIONN}
+      APPLICATION_FEE_CODE: ${PRO_APPLICATION_FEE_CODEL}
+      UK_COPIES_FEE_CODE: ${PRO_UK_COPIES_FEE_CODE}
+      OVERSEAS_COPIES_FEE_CODE: ${PRO_OVERSEAS_COPIES_FEE_CODE}
+      SERVICE_ID: ${PRO_SERVICE_ID}
+      SITE_ID: ${PRO_SITE_ID}
+  idam-pr:
+    redirect_uris:
+      Probate:
+        - https://${SERVICE_FQDN}/oauth2/callback
+  rpe-feature-toggle-api:
+    java:
+      readinessDelay: 180
+      livenessDelay: 180
+      readinessPeriod: 60
+      livenessPeriod: 60
+      keyVaults:
+      environment:
+        FEATURES_DB_NAME: features
+        FEATURES_DB_USER_NAME: hmcts
+        FEATURES_DB_PASSWORD: hmcts
+        ADMIN_USERNAME_TEST: admin@example.com
+        ADMIN_PASSWORD_TEST: Password
+        EDITOR_USERNAME_TEST: editor@example.com
+        EDITOR_PASSWORD_TEST: Password
+    importer:
+      adminUsername: admin@example.com
+      adminPassword: Password
+      cron:
+        enabled: false
+      oneoff:
+        command: /scripts/add-weighted-toggle.sh probate-fe-shutter 'Probate App Shutter' '1.0' &&
+          /scripts/add-weighted-toggle.sh probate-intestacy-questions 'Probate Intestacy Questionnaire' '1.0' &&
+          /scripts/add-weighted-toggle.sh probate-fees-api 'Probate New Fee API' '0.1' &&
+          /scripts/add-toggle.sh probate-webchat 'WebChat eature' false
+        enabled: true
+        permissions: probate-new-features-consent-given
+########################
+
+##### DEPENDENCIES #####
+rpe-send-letter-service:
+  java:
+    image: hmcts.azurecr.io/hmcts/rpe-send-letter-service:latest
+    readinessDelay: 180
+    livenessDelay: 180
+    readinessPeriod: 60
+    livenessPeriod: 60
+    keyVaults:
+    environment:
+      FILE_CLEANUP_ENABLED: true
+      LETTER_TRACKING_DB_CONN_OPTIONS: ""
+      LETTER_TRACKING_DB_NAME: send_letter
+      LETTER_TRACKING_DB_USER_NAME: "hmcts"
+      LETTER_TRACKING_DB_PASSWORD: "hmcts"
+
+dm-store:
+  java:
+    image: hmcts.azurecr.io/hmcts/dm-store:pr-334  # fix for postgres bug
+    readinessDelay: 180
+    livenessDelay: 180
+    readinessPeriod: 60
+    livenessPeriod: 60
+    secrets:
+      STORAGE_ACCOUNT_NAME:
+        disabled: true
+      STORAGE_ACCOUNT_KEY:
+        disabled: true
+      STORAGE_CONTAINER_DOCUMENT_CONTAINER_NAME:
+        disabled: true
+    keyVaults:
+    environment:
+      ENABLE_DB_MIGRATE: 'true'
+      ENABLE_TTL: 'false'
+      SPRING_DATASOURCE_USERNAME: hmcts
+      SPRING_DATASOURCE_PASSWORD: hmcts
+      ENABLE_AZURE_STORAGE_CONTAINER: 'false'
+      POSTGRES_STORAGE_ENABLED: 'true'
+      STORAGEACCOUNT_PRIMARY_CONNECTION_STRING: 'DefaultEndpointsProtocol=https;AccountName=AAAAAAAAAAAAAAAA;AccountKey=AAAAAAAAAAAAAAAA;EndpointSuffix=core.windows.net'
+      CASE_WORKER_ROLES: caseworker-cmc,caseworker-cmc-judge
+
+cmc-pdf-service:
+  java:
+    image: hmcts.azurecr.io/hmcts/cmc-pdf-service:latest
+    readinessDelay: 180
+    livenessDelay: 180
+    readinessPeriod: 60
+    livenessPeriod: 60
+    keyVaults:
+
+draft-store-service:
+  java:
+    image: hmcts.azurecr.io/hmcts/draft-store-service:latest
+    readinessDelay: 180
+    livenessDelay: 180
+    readinessPeriod: 60
+    livenessPeriod: 60
+    keyVaults:
+    environment:
+      DRAFT_STORE_DB_NAME: draftstore
+      DRAFT_STORE_DB_PORT: '5432'
+      DRAFT_STORE_DB_USER_NAME: hmcts
+      RUN_DB_MIGRATION_ON_STARTUP: 'true'
+      DRAFT_STORE_DB_PASSWORD: hmcts
+
+fees-register-api:
+  java:
+    image: hmcts.azurecr.io/hmcts/fees-register-api:latest
+    readinessDelay: 180
+    livenessDelay: 180
+    readinessPeriod: 45
+    livenessPeriod: 45
+    keyVaults:
+    environment:
+      SPRING_DATASOURCE_USERNAME: hmcts
+      SPRING_DATASOURCE_PASSWORD: hmcts
+      SPRING_LIQUIBASE_ENABLED: true
+      ENABLE_FEE_LOADER: true
+
+payment-api:
+  java:
+    image: hmcts.azurecr.io/hmcts/payment-api:latest
+    readinessDelay: 180
+    livenessDelay: 180
+    readinessPeriod: 60
+    livenessPeriod: 60
+    keyVaults:
+    environment:
+      ASB_CONNECTION_STRING: false
+      SPRING_DATASOURCE_USERNAME: hmcts
+      SPRING_DATASOURCE_PASSWORD: hmcts
+      SPRING_LIQUIBASE_ENABLED: true
+
+rpe-service-auth-provider:
+  java:
+    image: hmcts.azurecr.io/hmcts/rpe-service-auth-provider:latest
+    readinessDelay: 180
+    livenessDelay: 180
+    readinessPeriod: 60
+    livenessPeriod: 60
+    keyVaults:
+    environment:
+      TESTING_SUPPORT_ENABLED: 'true'
+      MICROSERVICEKEYS_CMC: AAAAAAAAAAAAAAAA
+      MICROSERVICEKEYS_CMC_CLAIM_SUBMIT_API: AAAAAAAAAAAAAAAA
+      MICROSERVICEKEYS_CMC_LEGAL_FRONTEND: AAAAAAAAAAAAAAAA
+      MICROSERVICEKEYS_CMC_CLAIM_STORE: AAAAAAAAAAAAAAAA
+      MICROSERVICEKEYS_EM_GW: AAAAAAAAAAAAAAAA
+      MICROSERVICEKEYS_CCD_DATA: AAAAAAAAAAAAAAAA
+      MICROSERVICEKEYS_CCD_DEFINITION: AAAAAAAAAAAAAAAA
+      MICROSERVICEKEYS_CCD_GATEWAY: AAAAAAAAAAAAAAAA
+      MICROSERVICEKEYS_CCD_GW: AAAAAAAAAAAAAAAA
+      MICROSERVICEKEYS_DG_DOCASSEMBLY_API: AAAAAAAAAAAAAAAA
+
+postgresql:
+  pgParameters:
+    maxConnections: 150
+  resources:
+    requests:
+      cpu: 25m
+  initdbScripts:
+    init.sql: |-
+      CREATE DATABASE "claimstore" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+      CREATE DATABASE "cmc" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+      CREATE DATABASE "features" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+      CREATE DATABASE "draftstore" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+      CREATE DATABASE "fees_register" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+      CREATE DATABASE "payment_api" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+      CREATE DATABASE "evidence" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+      CREATE DATABASE "send_letter" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+      CREATE DATABASE "data-store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+      CREATE DATABASE "definition-store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+      CREATE DATABASE "probate" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+  postgresqlUsername: hmcts
+  postgresqlPassword: hmcts
+  postgresqlDatabase: user-profile
+  persistence:
+    enabled: false
+########################

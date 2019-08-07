@@ -2,6 +2,6 @@ apiVersion: v1
 description: A Helm chart for the HMCTS Probate product
 name: probate
 version: 1.0.0
-icon: https://github.com/hmcts/chart-ccd/raw/master/images/icons8-java-50.png
+icon: https://github.com/hmcts/chart-probate/raw/master/images/icons8-java-50.png
 keywords:
   - probate
