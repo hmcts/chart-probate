@@ -11,9 +11,6 @@ dependencies:
   - name: probate-orchestrator-service
     version: ~0.0.4
     repository: '@hmctspublic'
-  - name: probate-persistence-service
-    version: ~0.0.2
-    repository: '@hmctspublic'
   - name: probate-back-office
     version: ~0.0.2
     repository: '@hmctspublic'
@@ -21,7 +18,7 @@ dependencies:
     version: ~1.0.2
     repository: '@hmctspublic'
   - name: probate-caveats-fe
-    version: ~1.0.0
+    version: ~1.0.1
     repository: '@hmctspublic'
   - name: rpe-service-auth-provider
     version: ~0.1.1
