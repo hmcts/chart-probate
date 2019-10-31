@@ -1,11 +1,11 @@
 .DEFAULT_GOAL := all
 CHART := probate
-RELEASE := chart-${CHART}-release
+RELEASE := chart-${CHART}
 NAMESPACE := chart-tests
 TEST := ${RELEASE}-test-service
-ACR := hmctssandbox
-AKS_RESOURCE_GROUP := cnp-aks-sandbox-rg
-AKS_CLUSTER := cnp-aks-sandbox-cluster
+ACR := hmctspublic
+AKS_RESOURCE_GROUP := cnp-aks-rg
+AKS_CLUSTER := cnp-aks-cluster
 
 setup:
 	az configure --defaults acr=${ACR}
@@ -22,6 +22,9 @@ lint:
 
 inspect:
 	helm inspect chart ${CHART}
+
+upgrade:
+	helm upgrade --install ${RELEASE}  ${CHART} --namespace ${NAMESPACE} -f ci-values.yaml  --wait
 
 deploy:
 	helm install ${CHART} --name ${RELEASE} --namespace ${NAMESPACE} -f ci-values.yaml  --wait
