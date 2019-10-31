@@ -1,0 +1,4 @@
+probate:
+
+global:
+  ccdIngress: "chart-probate.service.core-compute-preview.internal"

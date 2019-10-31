@@ -1,0 +1,57 @@
+tags:
+  ccd-enabled: true
+  ccd-idam-pr: false
+  ccd-elasticsearch: true
+
+ccd-elasticsearch:
+  logstash:
+    elasticsearch:
+      host: "{{ .Release.Name }}-ccd-es-client"
+  elasticsearch:
+    nameOverride: ccd-es
+    master:
+      persistence:
+        enabled: false
+    data:
+      persistence:
+        enabled: false
+  ccd:
+    ingressHost: '{{ .Values.global.ccdIngress }}'
+    idam-pr:
+      releaseNameOverride: '{{ .Release.Name }}-idam-pr'
+      redirect_uris:
+        CCD:
+          - https://case-management-web-{{ .Values.global.ccdIngress }}/oauth2redirect
+        CCD Admin:
+          - https://admin-web-{{ .Values.global.ccdIngress }}/oauth2redirect
+    definitionStoreApi:
+      s2sKey: AAAAAAAAAAAAA
+      s2sAuthorisedServices: ccd_admin,ccd_data,ccd_gw
+    apiGateway:
+      s2sKey: AAAAAAAAAAAAA
+      idamClientSecret:
+        value: 123456
+    dataStoreApi:
+      s2sKey: AAAAAAAAAAAAA
+      image: "hmctspublic.azurecr.io/ccd/data-store-api:latest"
+    caseManagementWeb:
+      enabled: true
+    adminWeb:
+      enabled: true
+      s2sKey: AAAAAAAAAAAAA
+      idamClientSecret:
+        value: 123456
+    importer:
+      userRoles:
+        - caseworker-probate
+        - caseworker-probate-issuer
+        - caseworker-probate-solicitor
+        - citizen
+        - caseworker-probate-examiner
+global:
+    devMode: true
+    postgresqlUsername: hmcts
+    postgresqlPassword: hmcts
+    bsoIdamRedirectUrl: "https://bulk-scan-orchestrator/oauth2/callback"
+    ccdIngress: ""
+
