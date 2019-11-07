@@ -11,4 +11,4 @@ ccd-elasticsearch:
     adminWeb:
       idamClientSecret: 
         fromSecret: false
-        value: 123456
+  ccdIngress: "chart-probate.service.core-compute-preview.internal"

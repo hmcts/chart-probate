@@ -4,6 +4,8 @@ dependencies:
     repository: '@hmctspublic'
 #   - name: ccd-elasticsearch
 #     version: '0.5.2'
+#   - name: ccd-elasticsearch
+#     version: '>0.0.1'
 #     repository: file:///home/praveen/github/chart-ccd-elasticsearch/ccd-elasticsearch
 
  
