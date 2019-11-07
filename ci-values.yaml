@@ -2,3 +2,12 @@ probate:
 
 global:
   ccdIngress: "chart-probate.service.core-compute-preview.internal"
+ccd-elasticsearch:
+  ccd:
+    apiGateway:        
+      idamClientSecret:
+        fromSecret: false
+        value: 123456
+    adminWeb:
+      idamClientSecret: 
+        fromSecret: false

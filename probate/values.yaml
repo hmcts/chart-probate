@@ -1,6 +1,6 @@
 tags:
   ccd-enabled: true
-  ccd-idam-pr: false
+  ccd-idam-pr: true
   ccd-elasticsearch: true
 
 ccd-elasticsearch:
@@ -25,22 +25,26 @@ ccd-elasticsearch:
         CCD Admin:
           - https://admin-web-{{ .Values.global.ccdIngress }}/oauth2redirect
     definitionStoreApi:
-      s2sKey: AAAAAAAAAAAAA
+      s2sKey: AAAAAAAAAAAAAAAA
       s2sAuthorisedServices: ccd_admin,ccd_data,ccd_gw
     apiGateway:
-      s2sKey: AAAAAAAAAAAAA
+      s2sKey: AAAAAAAAAAAAAAAA
       idamClientSecret:
-        value: 123456
+        fromSecret: true
+        secretKeyRefName: ccd-api-gateway-oauth2-client-secret
+        secretKeyRefKey: key
     dataStoreApi:
-      s2sKey: AAAAAAAAAAAAA
+      s2sKey: AAAAAAAAAAAAAAAA
       image: "hmctspublic.azurecr.io/ccd/data-store-api:latest"
     caseManagementWeb:
       enabled: true
     adminWeb:
       enabled: true
-      s2sKey: AAAAAAAAAAAAA
+      s2sKey: AAAAAAAAAAAAAAAA
       idamClientSecret:
-        value: 123456
+        fromSecret: true
+        secretKeyRefName: ccd-api-gateway-oauth2-client-secret
+        secretKeyRefKey: key
     importer:
       userRoles:
         - caseworker-probate
