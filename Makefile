@@ -16,6 +16,8 @@ setup:
 clean:
 	-helm delete --purge ${RELEASE}
 	-kubectl delete pod ${TEST} -n ${NAMESPACE}
+	-kubectl delete pod ${RELEASE}-idam-pr-bin-test-service -n ${NAMESPACE}
+	-kubectl delete pod ${RELEASE}-ccd-es-test -n ${NAMESPACE}
 
 lint:
 	helm lint ${CHART} --namespace ${NAMESPACE} -f ci-values.yaml
