@@ -20,9 +20,9 @@ ccd-elasticsearch:
     idam-pr:
       releaseNameOverride: '{{ .Release.Name }}-idam-pr'
       redirect_uris:
-        CCD:
+        ccd_gateway:
           - https://case-management-web-{{ .Values.global.ccdIngress }}/oauth2redirect
-        CCD Admin:
+        ccd_gateway:
           - https://admin-web-{{ .Values.global.ccdIngress }}/oauth2redirect
     definitionStoreApi:
       s2sKey: AAAAAAAAAAAAAAAA
