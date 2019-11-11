@@ -4,6 +4,10 @@ global:
   ccdIngress: "chart-probate.service.core-compute-preview.internal"
 ccd-elasticsearch:
   ccd:
+    ingressHost: "chart-probate.service.core-compute-preview.internal"
+    ingressIP: "10.97.17.51"
+    consulIP: "10.97.11.254"
+
     apiGateway:        
       idamClientSecret:
         fromSecret: false
