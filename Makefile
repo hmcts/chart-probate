@@ -18,6 +18,15 @@ clean:
 	-kubectl delete pod ${TEST} -n ${NAMESPACE}
 	-kubectl delete pod ${RELEASE}-idam-pr-bin-test-service -n ${NAMESPACE}
 	-kubectl delete pod ${RELEASE}-ccd-es-test -n ${NAMESPACE}
+	-kubectl delete pod rpe-send-letter-service-chart-probate-test -n ${NAMESPACE}
+	-kubectl delete pod chart-probate-idam-pr-bin-test-service -n ${NAMESPACE}
+	-kubectl delete pod cmc-pdf-service-chart-probate-test -n ${NAMESPACE}
+	-kubectl delete pod fees-chart-probate-test  -n ${NAMESPACE}
+	-kubectl delete pod rpe-feature-toggle-api-chart-probate-test -n ${NAMESPACE}
+	-kubectl delete pod rpe-service-auth-provider-chart-probate-test -n ${NAMESPACE}
+	-kubectl delete pod payment-api-chart-probate-test -n ${NAMESPACE}
+	-kubectl delete pod dm-store-chart-probate-test -n ${NAMESPACE}
+	-kubectl delete pod chart-probate-rpe-feature-toggle-api-test -n ${NAMESPACE}
 
 lint:
 	helm lint ${CHART} --namespace ${NAMESPACE} -f ci-values.yaml
@@ -29,7 +38,7 @@ upgrade:
 	helm upgrade --install ${RELEASE}  ${CHART} --namespace ${NAMESPACE} -f ci-values.yaml  --wait
 
 deploy:
-	helm install ${CHART} --name ${RELEASE} --namespace ${NAMESPACE} -f ci-values.yaml  --wait
+	helm install ${CHART} --name ${RELEASE} --namespace ${NAMESPACE} -f ci-values.yaml  --wait --timeout 600
 
 test:
 	helm test ${RELEASE}

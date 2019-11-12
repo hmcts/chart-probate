@@ -7,36 +7,38 @@ tags:
   blobstorage: false
   idam-pr: true 
 
+
 #####################################
 ##### Probate - Back Office
 #####################################
-probate-back-office:
-  java:
-    environment:
-      ingressHost: ""
-      image: hmctspublic.azurecr.io/probate/back-office:latest
-      AUTH_PROVIDER_SERVICE_CLIENT_KEY: AAAAAAAAAAAAAAAA
-      IDAM_CLIENT_NAME: probate
-      PROBATE_POSTGRESQL_USER: probate_man
-      PROBATE_POSTGRESQL_PASSWORD: '{{ .Values.global.postgresqlUsername }}'
-      PROBATE_POSTGRESQL_DATABASE: '{{ .Values.global.postgresqlPassword }}'
-      PROBATE_POSTGRESQL_HOSTNAME: "{{ .Release.Name }}-postgresql"
-      PROBATE_POSTGRESQL_PORT: 5432
-      AUTH_PROVIDER_SERVICE_CLIENT_BASEURL: "http://rpe-service-auth-provider-{{ .Release.Name }}"
-      PDF_SERVICE_URL: "http://cmc-pdf-service-{{ .Release.Name }}"
-      # PRINTSERVICE_HOST: https://return-case-doc-ccd.nonprod.platform.hmcts.net
-      # PRINTSERVICE_INTERNAL_HOST: http://ccd-case-print-service-aat.service.core-compute-aat.internal
-      # CCD_GATEWAY_HOST: http://ccd-api-gateway-web-aat.service.core-compute-aat.internal
-      # SERVICES_CORECASEDATA_BASEURL : http://ccd-data-store-api-aat.service.core-compute-aat.internal
-      IDAM_SERVICE_HOST:  https://idam-api.demo.platform.hmcts.net
-      FEE_API_URL: "http://fees-{{ .Release.Name }}"
-      EVIDENCE_MANAGEMENT_HOST: "http://dm-store-{{ .Release.Name }}"      
-      SEND_LETTER_SERIVCE_BASEURL: "http://rpe-send-letter-service-{{ .Release.Name }}"
-      IDAM_REDIRECT_URL: "http://{{ .Values.global.probateFrontend }}/oauth2/callback"
-      # IDAM_SECRET: ${IDAM_SECRET}
-      LOG_LEVEL: DEBUG
-      APPINSIGHTS_INSTRUMENTATIONKEY: 00000000-0000-0000-0000-000000000000
-      AUTH_S2S_CLIENT_ID: "probate_backend"
+# probate-back-office:
+#   java:
+#     environment:
+#       ingressHost: ""
+#       image: hmctspublic.azurecr.io/probate/back-office:latest
+#       AUTH_PROVIDER_SERVICE_CLIENT_KEY: AAAAAAAAAAAAAAAA
+#       IDAM_CLIENT_NAME: probate
+#       PROBATE_POSTGRESQL_USER: probate_man
+#       PROBATE_POSTGRESQL_PASSWORD: hmcts
+#       PROBATE_POSTGRESQL_DATABASE: hmcts
+#       PROBATE_POSTGRESQL_HOSTNAME: "chart-probate-postgresql"
+#       PROBATE_POSTGRESQL_PORT: 5432
+#       AUTH_PROVIDER_SERVICE_CLIENT_BASEURL: "http://rpe-service-auth-provider-chart-probate"
+#       PDF_SERVICE_URL: "http://cmc-pdf-service-chart-probate"
+#       PRINTSERVICE_HOST: http://ccd-case-print-service
+#       PRINTSERVICE_INTERNAL_HOST: http://ccd-case-print-service
+#       CCD_GATEWAY_HOST: http://ccd-api-gateway-web
+#       SERVICES_CORECASEDATA_BASEURL : http://ccd-data-store
+#       IDAM_SERVICE_HOST:  https://idam-api.demo.platform.hmcts.net
+#       FEE_API_URL: "http://fees-chart-probate"
+#       EVIDENCE_MANAGEMENT_HOST: "http://dm-store-chart-probate"      
+#       SEND_LETTER_SERIVCE_BASEURL: "http://rpe-send-letter-service-chart-probate"
+#       IDAM_REDIRECT_URL: "http://{{ .Values.global.probateFrontend }}/oauth2/callback"
+#       # IDAM_SECRET: ${IDAM_SECRET}
+#       LOG_LEVEL: DEBUG
+#       APPINSIGHTS_INSTRUMENTATIONKEY: 00000000-0000-0000-0000-000000000000
+#       AUTH_S2S_CLIENT_ID: "probate_backend"
+
       
 #####################################
 ##### ccd & elasticsearch &Logstash
@@ -56,13 +58,18 @@ ccd-elasticsearch:
   ccd:
     idamApiUrl: https://idam-api.demo.platform.hmcts.net
     idamWebUrl: https://idam-web-public.demo.platform.hmcts.net
-    s2sUrl: "http://rpe-service-auth-provider-{{ .Release.Name }}"
-    draftStoreUrl: "http://draft-store-service-{{ .Release.Name }}"
-    paymentsUrl: "http://payment-api-{{ .Release.Name }}"
+    s2sUrl: "http://rpe-service-auth-provider-chart-probate"
+    draftStoreUrl: "http://draft-store-service-chart-probate"
+    paymentsUrl: "http://payment-api-chart-probate"
     ingressHost: '{{ .Values.global.ccdIngress }}'
-    releaseNameOverride: "ccd-{{ .Release.Name }}"
+    releaseNameOverride: "ccd-chart-probate"
+    userProfileApi:
+      environment: 
+        USER_PROFILE_DB_HOST: "chart-probate-postgresql"
+        IDAM_S2S_URL: "http://rpe-service-auth-provider-chart-probate"
+        USER_PROFILE_S2S_AUTHORISED_SERVICES: AAAAAAAAAAAAAAAA
     idam-pr:
-      releaseNameOverride: 'idam-pr-{{ .Release.Name }}'
+      releaseNameOverride: '{{ .Release.Name }}-idam-pr'
       redirect_uris:
         ccd_gateway:
           - https://case-management-web-{{ .Values.global.ccdIngress }}/oauth2redirect
@@ -70,6 +77,13 @@ ccd-elasticsearch:
     definitionStoreApi:
       s2sKey: AAAAAAAAAAAAAAAA
       s2sAuthorisedServices: ccd_admin,ccd_data,ccd_gw
+      environment: 
+        DEFINITION_STORE_DB_NAME: definition-store
+        DEFINITION_STORE_DB_HOST: "chart-probate-postgresql"
+        DEFINITION_STORE_DB_USERNAME: hmcts
+        DEFINITION_STORE_DB_PASSWORD: hmcts
+        DEFINITION_STORE_DB_OPTIONS: "?sslmode=disable"
+        ENABLE_DB_MIGRATE: true
     apiGateway:
       s2sKey: AAAAAAAAAAAAAAAA
       idamClientSecret:
@@ -79,6 +93,13 @@ ccd-elasticsearch:
     dataStoreApi:
       s2sKey: AAAAAAAAAAAAAAAA
       image: "hmctspublic.azurecr.io/ccd/data-store-api:latest"
+      environment: 
+        DATA_STORE_DB_NAME: data-store
+        DATA_STORE_DB_HOST: "chart-probate-postgresql"
+        DATA_STORE_DB_USERNAME: hmcts
+        DATA_STORE_DB_PASSWORD: hmcts
+        DATA_STORE_DB_OPTIONS: "?sslmode=disable"
+        ENABLE_DB_MIGRATE: true
     caseManagementWeb:
       enabled: true
     # testStubsService:
@@ -90,6 +111,8 @@ ccd-elasticsearch:
         fromSecret: true
         secretKeyRefName: ccd-api-gateway-oauth2-client-secret
         secretKeyRefKey: key
+    postgresql:
+      enabled: false
     importer:
       userRoles:
         - caseworker-probate
@@ -109,17 +132,19 @@ rpe-send-letter-service:
     livenessDelay: 180
     readinessPeriod: 60
     livenessPeriod: 60
-    releaseNameOverride: "rpe-send-letter-service-{{ .Release.Name }}"
+    releaseNameOverride: "rpe-send-letter-service-chart-probate"
     environment:
       FILE_CLEANUP_ENABLED: true
-      LETTER_TRACKING_DB_HOST: "{{ .Release.Name }}-postgresql"
+      LETTER_TRACKING_DB_HOST: "chart-probate-postgresql"
       LETTER_TRACKING_DB_NAME: "send_letter"
-      LETTER_TRACKING_DB_USER_NAME: '{{ .Values.global.postgresqlUsername }}'
-      LETTER_TRACKING_DB_PASSWORD: '{{ .Values.global.postgresqlPassword }}'
+      LETTER_TRACKING_DB_USER_NAME: hmcts
+      LETTER_TRACKING_DB_PASSWORD: hmcts
+      # LETTER_TRACKING_DB_USER_NAME: '{{ .Values.global.postgresqlUsername }}'
+      # LETTER_TRACKING_DB_PASSWORD: '{{ .Values.global.postgresqlPassword }}'
       LETTER_TRACKING_DB_CONN_OPTIONS: ""
-      FLYWAY_URL: "jdbc:postgresql://{{ .Release.Name }}-postgresql:5432/send_letter?sslmode=require"
+      FLYWAY_URL: "jdbc:postgresql://chart-probate-postgresql:5432/send_letter?sslmode=require"
       FLYWAY_NOOP_STRATEGY: "false"
-      S2S_URL: "http://rpe-service-auth-provider-{{ .Release.Name }}"
+      S2S_URL: "http://rpe-service-auth-provider-chart-probate"
       ENCRYPTION_ENABLED: "false"
       APPINSIGHTS_INSTRUMENTATIONKEY: 00000000-0000-0000-0000-000000000000
 
@@ -137,18 +162,18 @@ dm-store:
         disabled: true
       STORAGE_CONTAINER_DOCUMENT_CONTAINER_NAME:
         disabled: true
-    releaseNameOverride: "dm-store-{{ .Release.Name }}"
+    releaseNameOverride: "dm-store-chart-probate"
     environment:
       ENABLE_DB_MIGRATE: 'true'
       ENABLE_TTL: 'false'
-      SPRING_DATASOURCE_USERNAME: '{{ .Values.global.postgresqlUsername }}'
-      SPRING_DATASOURCE_PASSWORD: '{{ .Values.global.postgresqlPassword }}'
+      SPRING_DATASOURCE_USERNAME: hmcts
+      SPRING_DATASOURCE_PASSWORD: hmcts
       ENABLE_AZURE_STORAGE_CONTAINER: 'false'
       POSTGRES_STORAGE_ENABLED: 'true'
       STORAGEACCOUNT_PRIMARY_CONNECTION_STRING: 'DefaultEndpointsProtocol=https;AccountName=AAAAAAAAAAAAAAAA;AccountKey=AAAAAAAAAAAAAAAA;EndpointSuffix=core.windows.net'
       CASE_WORKER_ROLES: caseworker-probate
       S2S_NAMES_WHITELIST: ccd_gw,ccd_data,ccd_ps,probate_backend,probate_frontend,bulk_scan_orchestrator,bulk_scan_processor
-      SPRING_DATASOURCE_URL: "jdbc:postgresql://{{ .Release.Name }}-postgresql:5432/evidence"
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://chart-probate-postgresql:5432/evidence"
       DM_MULTIPART_WHITELIST: image/jpeg,application/pdf,image/tiff,image/png,image/bmp,text/plain,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.wordprocessingml.template,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.openxmlformats-officedocument.spreadsheetml.template,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/vnd.openxmlformats-officedocument.presentationml.template,application/vnd.openxmlformats-officedocument.presentationml.slideshow
       DM_MULTIPART_WHITELIST_EXT: .jpg,.jpeg,.bmp,.tif,.tiff,.png,.pdf,.txt,.doc,.dot,.docx,.dotx,.xls,.xlt,.xla,.xlsx,.xltx,.xlsb,.ppt,.pot,.pps,.ppa,.pptx,.potx,.ppsx
       MAX_FILE_SIZE: 500MB
@@ -164,7 +189,7 @@ cmc-pdf-service:
     livenessDelay: 180
     readinessPeriod: 60
     livenessPeriod: 60
-    releaseNameOverride: "cmc-pdf-service-{{ .Release.Name }}"
+    releaseNameOverride: "cmc-pdf-service-chart-probate"
 
 draft-store-service:
   java:
@@ -174,12 +199,12 @@ draft-store-service:
     livenessDelay: 180
     readinessPeriod: 60
     livenessPeriod: 60
-    releaseNameOverride: "draft-store-service-{{ .Release.Name }}"
+    releaseNameOverride: "draft-store-service-chart-probate"
     environment:
-      DRAFT_STORE_DB_HOST: "{{ .Release.Name }}-postgresql"
+      DRAFT_STORE_DB_HOST: "chart-probate-postgresql"
       DRAFT_STORE_DB_NAME: draftstore
-      DRAFT_STORE_DB_USER_NAME: '{{ .Values.global.postgresqlUsername }}'
-      DRAFT_STORE_DB_PASSWORD: '{{ .Values.global.postgresqlPassword }}'
+      DRAFT_STORE_DB_USER_NAME: hmcts
+      DRAFT_STORE_DB_PASSWORD: hmcts
       RUN_DB_MIGRATION_ON_STARTUP: true
       DRAFT_STORE_DB_CONN_OPTIONS: ""
 
@@ -191,11 +216,11 @@ fees-register-api:
     livenessDelay: 180
     readinessPeriod: 45
     livenessPeriod: 45
-    releaseNameOverride: "fees-{{ .Release.Name }}"
+    releaseNameOverride: "fees-chart-probate"
     environment:
-      SPRING_DATASOURCE_URL: "jdbc:postgresql://{{ .Release.Name }}-postgresql:5432/fees_register"
-      SPRING_DATASOURCE_USERNAME: '{{ .Values.global.postgresqlUsername }}'
-      SPRING_DATASOURCE_PASSWORD: '{{ .Values.global.postgresqlPassword }}'
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://chart-probate-postgresql:5432/fees_register"
+      SPRING_DATASOURCE_USERNAME: hmcts
+      SPRING_DATASOURCE_PASSWORD: hmcts
       SPRING_LIQUIBASE_ENABLED: true
       ENABLE_FEE_LOADER: true
 
@@ -207,14 +232,14 @@ payment-api:
     livenessDelay: 180
     readinessPeriod: 60
     livenessPeriod: 60
-    releaseNameOverride: "payment-api-{{ .Release.Name }}"
+    releaseNameOverride: "payment-api-chart-probate"
     environment:
       PAYMENT_AUDIT_FILE: /tmp/payment-audit.log
       ASB_CONNECTION_STRING: false
-      SPRING_DATASOURCE_USERNAME: '{{ .Values.global.postgresqlUsername }}'
-      SPRING_DATASOURCE_PASSWORD: '{{ .Values.global.postgresqlPassword }}'
+      SPRING_DATASOURCE_USERNAME: hmcts
+      SPRING_DATASOURCE_PASSWORD: hmcts
       SPRING_LIQUIBASE_ENABLED: true
-      SPRING_DATASOURCE_URL: "jdbc:postgresql://{{ .Release.Name }}-postgresql:5432/payment_api"
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://chart-probate-postgresql:5432/payment_api"
 
 rpe-service-auth-provider:
   java:
@@ -224,7 +249,7 @@ rpe-service-auth-provider:
     livenessDelay: 180
     readinessPeriod: 60
     livenessPeriod: 60
-    releaseNameOverride: "rpe-service-auth-provider-{{ .Release.Name }}"
+    releaseNameOverride: "rpe-service-auth-provider-chart-probate"
     environment:
       TESTING_SUPPORT_ENABLED: 'true'
       MICROSERVICEKEYS_EM_GW: AAAAAAAAAAAAAAAA
@@ -244,7 +269,7 @@ rpe-feature-toggle-api:
     livenessDelay: 180
     readinessPeriod: 60
     livenessPeriod: 60
-    releaseNameOverride: "rpe-feature-toggle-api-{{ .Release.Name }}"
+    releaseNameOverride: "rpe-feature-toggle-api-chart-probate"
     importer:
       cron:
         enabled: false
@@ -270,8 +295,10 @@ postgresql:
       CREATE DATABASE "probate" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
       CREATE DATABASE "probate_man" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
       CREATE DATABASE "features" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-  postgresqlUsername: '{{ .Values.global.postgresqlUsername }}'
-  postgresqlPassword: '{{ .Values.global.postgresqlPassword }}'
+  # postgresqlUsername: '{{ .Values.global.postgresqlUsername }}'
+  # postgresqlPassword: '{{ .Values.global.postgresqlPassword }}'
+  postgresqlUsername: hmcts
+  postgresqlPassword: hmcts
   postgresqlDatabase: user-profile
   persistence:
     enabled: false
