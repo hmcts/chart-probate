@@ -2,12 +2,66 @@ tags:
   ccd-enabled: true
   ccd-idam-pr: true
   ccd-elasticsearch: true
-  rpe-feature-toggle-api-pod: true
+  rpe-feature-toggle-api-pod: false
   postgresql-pod: false
   blobstorage: false
   idam-pr: true 
 
-
+#######################################
+##### Probate - Orchestrator Service
+#######################################
+# probate-orchestrator-service:
+#   java:
+#     releaseNameOverride: "probate-orchestrator-service-chart-probate"
+#     environment:
+#       REFORM_TEAM: probate
+#       REFORM_SERVICE_NAME: orchestrator-service
+#       PACT_BROKER_URL: test-broker
+#       PACT_BROKER_PORT: 80
+#       REFORM_ENVIRONMENT : demo
+#       DEPLOYMENT_ENV : demo
+#       SERVICES_PERSISTENCE_BASEURL : "http://probate-persistence-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
+#       AUTH_PROVIDER_SERVICE_CLIENT_BASEURL : "http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
+#       SERVICES_CORECASEDATA_BASEURL : "http://ccd-data-store-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
+#       SERVICES_AUTH_PROVIDER_BASEURL : "http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
+#       AUTH_IDAM_CLIENT_BASEURL : "https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net"
+#       SUBMIT_SERVICE_API_URL : "http://probate-submit-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
+#       BUSINESS_SERVICE_API_URL : "http://probate-business-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
+#       BACK_OFFICE_API_URL: "http://probate-back-office-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
+#       MAIL_JAVAMAILPROPERTIES_MAIL_SMTP_SSL_ENABLE: false
+#       MAIL_JAVAMAILPROPERTIES_MAIL_SMTP_AUTH: false
+#       SERVICES_CORECASEDATA_ENABLED: true
+#       MAIL_JAVAMAILPROPERTIES_SUBJECT: Probate Application
+#       java_app_name: "orchestrator-service"
+#       LOG_LEVEL: "INFO"
+#       IDAM_CLIENT_ID: "probate"
+#       AUTH_S2S_CLIENT_ID: "probate_backend"
+# #######################################
+# ##### Probate - Submit Service
+# #######################################
+# probate-submit-service:
+#   java:
+#     environment:
+#       ingressHost: ""
+#       image: hmctspublic.azurecr.io/probate/submit-service:latest
+#       S2S_AUTH_TOTP_SECRET: AAAAAAAAAAAAAAAA
+#       REFORM_TEAM: probate
+#       REFORM_SERVICE_NAME: submit-service
+#       MAIL_JAVAMAILPROPERTIES_MAIL_SMTP_SSL_ENABLE: false
+#       MAIL_JAVAMAILPROPERTIES_MAIL_SMTP_AUTH: false
+#       SERVICES_CORECASEDATA_ENABLED: true
+#       MAIL_JAVAMAILPROPERTIES_SUBJECT: "Probate Application"
+#       PACT_BROKER_URL: test
+#       PACT_BROKER_PORT: 80
+#       LOG_LEVEL : DEBUG
+#       AUTH_S2S_CLIENT_ID: "probate_backend"
+#       AUTH_PROVIDER_SERVICE_CLIENT_BASEURL: "http://rpe-service-auth-provider-chart-probate"
+#       SERVICES_PERSISTENCE_BASEURL: "Not Given"
+#       SERVICES_CORECASEDATA_BASEURL : http://ccd-data-store
+#       AUTH_IDAM_CLIENT_BASEURL: https://idam-api.demo.platform.hmcts.net
+#       SERVICES_CORECASEDATA_ENABLED : true
+#       SPRING_APPLICATION_JSON : '{"registries":[{"address":"Principal Registry of the Family Division (PRFD)\nHMCTS Probate\nPO Box 12625\nHarlow\nCM20 9QE","name":"ctsc"}]}'
+  
 #####################################
 ##### Probate - Back Office
 #####################################
@@ -73,6 +127,7 @@ ccd-elasticsearch:
       redirect_uris:
         ccd_gateway:
           - https://case-management-web-{{ .Values.global.ccdIngress }}/oauth2redirect
+        ccd_gateway:
           - https://admin-web-{{ .Values.global.ccdIngress }}/oauth2redirect
     definitionStoreApi:
       s2sKey: AAAAAAAAAAAAAAAA
@@ -142,11 +197,12 @@ rpe-send-letter-service:
       # LETTER_TRACKING_DB_USER_NAME: '{{ .Values.global.postgresqlUsername }}'
       # LETTER_TRACKING_DB_PASSWORD: '{{ .Values.global.postgresqlPassword }}'
       LETTER_TRACKING_DB_CONN_OPTIONS: ""
-      FLYWAY_URL: "jdbc:postgresql://chart-probate-postgresql:5432/send_letter?sslmode=require"
+      FLYWAY_URL: "jdbc:postgresql://chart-probate-postgresql:5432/send_letter?sslmode=disable"
       FLYWAY_NOOP_STRATEGY: "false"
       S2S_URL: "http://rpe-service-auth-provider-chart-probate"
       ENCRYPTION_ENABLED: "false"
       APPINSIGHTS_INSTRUMENTATIONKEY: 00000000-0000-0000-0000-000000000000
+
 
 dm-store:
   java:
@@ -180,6 +236,7 @@ dm-store:
       MAX_ACTIVE_DB_CONNECTIONS: 10
       ENDPOINTS_HEALTH_SENSITIVE: false
       ENDPOINTS_INFO_SENSITIVE: false
+      IDAM_S2S_BASE_URI: "http://rpe-service-auth-provider-chart-probate"
 
 cmc-pdf-service:
   java:
@@ -206,7 +263,7 @@ draft-store-service:
       DRAFT_STORE_DB_USER_NAME: hmcts
       DRAFT_STORE_DB_PASSWORD: hmcts
       RUN_DB_MIGRATION_ON_STARTUP: true
-      DRAFT_STORE_DB_CONN_OPTIONS: ""
+      DRAFT_STORE_DB_CONN_OPTIONS: "?sslmode=disable"
 
 fees-register-api:
   java:
@@ -218,10 +275,14 @@ fees-register-api:
     livenessPeriod: 45
     releaseNameOverride: "fees-chart-probate"
     environment:
+      POSTGRES_CONNECTION_OPTIONS:  "?sslmode=disable"
+      POSTGRES_HOST: "chart-probate-postgresql"
+      POSTGRES_NAME: "fees_register"
       SPRING_DATASOURCE_URL: "jdbc:postgresql://chart-probate-postgresql:5432/fees_register"
       SPRING_DATASOURCE_USERNAME: hmcts
       SPRING_DATASOURCE_PASSWORD: hmcts
       SPRING_LIQUIBASE_ENABLED: true
+      IDAM_CLIENT_BASE_URL: "https://idam-api.demo.platform.hmcts.net"
       ENABLE_FEE_LOADER: true
 
 payment-api:
@@ -236,11 +297,16 @@ payment-api:
     environment:
       PAYMENT_AUDIT_FILE: /tmp/payment-audit.log
       ASB_CONNECTION_STRING: false
+      AUTH_IDAM_CLIENT_BASEURL: https://idam-api.demo.platform.hmcts.net
+      AUTH_PROVIDER_SERVICE_CLIENT_BASEURL: http://rpe-service-auth-provider-chart-probate
+      CORE_CASE_DATA_API_URL: http://chart-probate-data-store-api
+      FEES_REGISTER_URL: http://fees-chart-probate
       SPRING_DATASOURCE_USERNAME: hmcts
       SPRING_DATASOURCE_PASSWORD: hmcts
       SPRING_LIQUIBASE_ENABLED: true
       SPRING_DATASOURCE_URL: "jdbc:postgresql://chart-probate-postgresql:5432/payment_api"
-
+      PAYBUBBLE_HOME_URL: "https://ccpay-bubble.demo.platform.hmcts.net"
+      
 rpe-service-auth-provider:
   java:
     ingressHost: ""
