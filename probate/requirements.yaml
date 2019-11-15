@@ -2,10 +2,43 @@ dependencies:
   - name: ccd-elasticsearch
     version: '0.5.3'
     repository: '@hmctspublic'
-#   - name: ccd-elasticsearch
-#     version: '0.5.2'
-#   - name: ccd-elasticsearch
-#     version: '>0.0.1'
-#     repository: file:///home/praveen/github/chart-ccd-elasticsearch/ccd-elasticsearch
-
- 
+  - name: rpe-service-auth-provider
+    version: ~0.2.4
+    repository: '@hmctspublic'
+  - name: cmc-pdf-service
+    version: ~0.2.1
+    repository: '@hmctspublic'
+  - name: fees-register-api
+    version: ~0.0.4
+    repository: '@hmctspublic'
+  - name: payment-api
+    version: ~0.1.1
+    repository: '@hmctspublic'
+  - name: dm-store
+    version: ~2.0.2
+    repository: '@hmctspublic'
+  - name: rpe-send-letter-service
+    version: ~0.0.9
+    repository: '@hmctspublic'
+  - name: rpe-feature-toggle-api
+    version: ~3.0.2
+    repository: '@hmctspublic'
+  - name: probate-back-office
+    version: ~0.1.5
+    repository: '@hmctspublic'
+  - name: postgresql
+    version: ~5.3.0
+    repository: '@stable'
+  # - name: probate-frontend
+  #   version: ~1.0.3
+  #   repository: '@hmctspublic'
+  - name: probate-business-service
+    version: ~0.0.7
+    repository: '@hmctspublic'
+  - name: probate-submit-service
+    version: ~0.2.4
+    repository: '@hmctspublic'
+  - name: probate-orchestrator-service
+    version: ~0.1.0
+    repository: '@hmctspublic'
+  

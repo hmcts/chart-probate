@@ -1,10 +1,11 @@
 probate:
 
 global:
-  ccdIngress: "chart-probate.service.core-compute-preview.internal"
+  ccdIngress: "chart-probate-ccd.service.core-compute-preview.internal"
+  probateFrontend: "chart-probate.service.core-compute-preview.internal"
 ccd-elasticsearch:
   ccd:
-    ingressHost: "chart-probate.service.core-compute-preview.internal"
+    ingressHost: "chart-probate-ccd.service.core-compute-preview.internal"
     ingressIP: "10.97.17.51"
     consulIP: "10.97.11.254"
 
