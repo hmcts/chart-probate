@@ -85,6 +85,11 @@ probate-orchestrator-service:
       SUBMIT_SERVICE_API_URL : http://probate-submit-service-chart-probate
       BUSINESS_SERVICE_API_URL : http://probate-business-service-chart-probate
       BACK_OFFICE_API_URL: http://probate-back-office-chart-probate
+      S2S_AUTH_TOTP_SECRET: AAAAAAAAAAAAAAAA
+      IDAM_API_REDIRECT_URL: "http://frontend-chart-probate/oauth2/callback"	
+      AUTH2_CLIENT_SECRET: 123456
+      # PAYMENT_CASEWORKER_USERNAME: ${PAYMENT_CASEWORKER_USERNAME}	
+      # PAYMENT_CASEWORKER_PASSWORD:  ${PAYMENT_CASEWORKER_PASSWORD}
       MAIL_JAVAMAILPROPERTIES_MAIL_SMTP_SSL_ENABLE: false
       MAIL_JAVAMAILPROPERTIES_MAIL_SMTP_AUTH: false
       SERVICES_CORECASEDATA_ENABLED: true
