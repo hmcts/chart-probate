@@ -14,7 +14,7 @@ dependencies:
   - name: probate-submit-service
     version: ~0.2.7
     repository: '@hmctspublic'
-  - name: probate-orchestrator
+  - name: probate-orchestrator-service
     version: ~1.0.0
     repository: '@hmctspublic'
   - name: ccd-elasticsearch
