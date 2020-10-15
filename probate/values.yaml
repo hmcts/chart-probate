@@ -1,7 +1,8 @@
 tags:
   ccd-enabled: true
   ccd-idam-pr: true
-  ccd-elasticsearch: true  idam-pr: true                         # citizen-frontend chart - will add IDAM redirect urls
+  ccd-elasticsearch: true
+  idam-pr: true                         # citizen-frontend chart - will add IDAM redirect urls
   ccd-idam-pr: true                     # claim-store chart - will add IDAM redirect urls
 
 ccd-elasticsearch:
