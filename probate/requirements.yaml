@@ -1,11 +1,25 @@
 dependencies:
+  - name: probate-frontend
+    version: ~2.0.14
+    repository: '@hmctspublic'
+  - name: probate-caveats-fe
+    version: ~1.1.14
+    repository: '@hmctspublic'
+  - name: probate-business-service
+    version: ~0.1.1
+    repository: '@hmctspublic'
+  - name: probate-back-office
+    version: ~1.0.2
+    repository: '@hmctspublic'
+  - name: probate-submit-service
+    version: ~0.2.7
+    repository: '@hmctspublic'
+  - name: probate-orchestrator
+    version: ~1.0.0
+    repository: '@hmctspublic'
   - name: ccd-elasticsearch
     version: '0.5.3'
     repository: '@hmctspublic'
-#   - name: ccd-elasticsearch
-#     version: '0.5.2'
-#   - name: ccd-elasticsearch
-#     version: '>0.0.1'
-#     repository: file:///home/praveen/github/chart-ccd-elasticsearch/ccd-elasticsearch
+
 
  
