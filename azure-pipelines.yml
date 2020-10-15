@@ -16,17 +16,6 @@ resources:
     endpoint: 'hmcts'
 
 jobs:
-- job: Validate
-  pool:
-    vmImage: 'Ubuntu 16.04'
-  steps:
-  - template: steps/charts/validate.yaml@cnp-library
-    parameters:
-      chartName: probate
-      chartReleaseName: chart-probate-ci-test
-      chartNamespace: chart-tests
-      helmInstallTimeout: "1000"
-      helmVersion: "2.15.2"
 
 - job: Release
   # Make sure we have a tag to run this job
